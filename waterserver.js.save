@@ -1,0 +1,28 @@
+var CH1 = new Gpio(22, 'out');
+var CH2 = new Gpio(23, 'out');
+var CH3 = new Gpio(24, 'out');
+var CH4 = new Gpio(25, 'out');
+
+//start here
+
+
+
+//end here
+
+function unexportOnClose() {
+
+ CH1.writeSync(0);
+  CH1.unexport(); // 
+
+ CH2.writeSync(0); // 
+  CH2.unexport(); // 
+
+ CH3.writeSync(0); // 
+  CH3.unexport(); // 
+
+ CH4.writeSync(0); // 
+  CH4.unexport(); // 
+
+}
+
+process.on('SIGINT', unexportOnClose); 

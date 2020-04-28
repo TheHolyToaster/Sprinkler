@@ -1,9 +1,10 @@
 var Gpio = require('onoff').Gpio; 
-var CH1 = new Gpio(22, 'out');
-var CH2 = new Gpio(23, 'out');
-var CH3 = new Gpio(24, 'out');
-var CH4 = new Gpio(25, 'out');
+var CH1 = new Gpio(22, 'out'),
+    CH2 = new Gpio(23, 'out'),
+    CH3 = new Gpio(24, 'out'),
+    CH4 = new Gpio(25, 'out');
 
+var ZONEs = [CH1, CH2, CH3, CH4];
 var http = require('http').createServer(handler); 
 var fs = require('fs'); 
 var io = require('socket.io')(http) 
@@ -32,27 +33,7 @@ io.sockets.on('connection', function (socket) {
     }
       socket.emit('event', zonevalue + ' #1'); //send button status to client
   });
-  socket.on('zone2', function(data) { //get light switch status from client
-    var zonevalue = data;
-    if (zonevalue != CH2.readSync()) { //only change LED if status has changed
-      CH2.writeSync(zonevalue); //turn LED on or off
-    }
-      socket.emit('event', zonevalue + ' #2'); //send button status to client
-  });
-  socket.on('zone3', function(data) { //get light switch status from client
-    var zonevalue = data;
-    if (zonevalue != CH3.readSync()) { //only change LED if status has changed
-      CH3.writeSync(zonevalue); //turn LED on or off
-    }
-      socket.emit('event', zonevalue + ' #3'); //send button status to client
-  });
-  socket.on('zone4', function(data) { //get light switch status from client
-    var zonevalue = data;
-    if (zonevalue != CH4.readSync()) { //only change LED if status has changed
-      CH4.writeSync(zonevalue); //turn LED on or off
-    }
-      socket.emit('event', zonevalue + ' #4'); //send button status to client
-  });
+
 });
 
 

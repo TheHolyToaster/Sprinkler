@@ -11,21 +11,12 @@
 <script>
 var socket = io();
 window.addEventListener("load", function(){
-  var z1 = document.getElementById("zone1");
-  z1.addEventListener("change", function() {
-    socket.emit("zone1", Number(this.checked));
-  });
-  var z2 = document.getElementById("zone2");
-  z2.addEventListener("change", function() {
-    socket.emit("zone2", Number(this.checked));
-  });
-  var z3 = document.getElementById("zone3");
-  z3.addEventListener("change", function() {
-    socket.emit("zone3", Number(this.checked));
-  });
-  var z4 = document.getElementById("zone4");
-  z4.addEventListener("change", function() {
-    socket.emit("zone4", Number(this.checked));
+  var INs = document.getElementByType("input");
+  INs.forEach(function(z, i){
+    z.addEventListener("change", function() {
+      var zone = {id : i, value: Number(this.checked)}
+      socket.emit("zone", zone );
+    });
   });
 });
 socket.on('event', function (data) {

@@ -1,3 +1,4 @@
+
 var Gpio = require('onoff').Gpio; 
 var CH1 = new Gpio(22, 'out'),
     CH2 = new Gpio(23, 'out'),
@@ -5,6 +6,7 @@ var CH1 = new Gpio(22, 'out'),
     CH4 = new Gpio(25, 'out');
 
 var ZONEs = [CH1, CH2, CH3, CH4];
+
 var http = require('http').createServer(handler); 
 var fs = require('fs'); 
 var io = require('socket.io')(http) 
@@ -13,6 +15,7 @@ var io = require('socket.io')(http)
 http.listen(1234); 
 
 function handler (req, res) { 
+  return res.write('hello');
   fs.readFile(__dirname + '/public/index.html', function(err, data) { 
     if (err) {
       res.writeHead(404, {'Content-Type': 'text/html'}); 
@@ -24,7 +27,7 @@ function handler (req, res) {
   });
 }
 
-/*
+
 io.sockets.on('connection', function (socket) {
   socket.on('zone1', function(data) { //get light switch status from client
     var zonevalue = data;
@@ -35,7 +38,7 @@ io.sockets.on('connection', function (socket) {
   });
 
 });
-*/
+
 
 
 process.on('SIGINT', function () { //on ctrl+c

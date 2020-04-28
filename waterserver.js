@@ -16,7 +16,7 @@ function handler (req, res) {
   fs.readFile(__dirname + '/public/index.html', function(err, data) { 
     if (err) {
       res.writeHead(404, {'Content-Type': 'text/html'}); 
-      return res.end("404 Not Found");
+      return res.end("404 Not Not Found");
     }
     res.writeHead(200, {'Content-Type': 'text/html'}); 
     res.write(data); 
@@ -24,7 +24,7 @@ function handler (req, res) {
   });
 }
 
-
+/*
 io.sockets.on('connection', function (socket) {
   socket.on('zone1', function(data) { //get light switch status from client
     var zonevalue = data;
@@ -35,7 +35,7 @@ io.sockets.on('connection', function (socket) {
   });
 
 });
-
+*/
 
 
 process.on('SIGINT', function () { //on ctrl+c

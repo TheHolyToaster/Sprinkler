@@ -30,6 +30,11 @@ function handler (req, res) {
 
 
 io.sockets.on('connection', function (socket) {
+  socket.on('length?', function(data) {
+    
+      socket.emit('length!', ZONEs.length);
+  });
+
   socket.on('zone', function(data) {
     console.log(data);
     var value = data.value;
@@ -44,22 +49,12 @@ io.sockets.on('connection', function (socket) {
 
 
 
-process.on('SIGINT', function () { //on ctrl+c
-  
- CH1.writeSync(0);
-  CH1.unexport();  
-
- CH2.writeSync(0);  
-  CH2.unexport();  
-
- CH3.writeSync(0); 
-  CH3.unexport();  
-
- CH4.writeSync(0);  
-  CH4.unexport(); 
-  
-  
-  process.exit(); //exit completely
+process.on('SIGINT', function () {
+  ZONEs.forEach(function(z){
+    z.writeSync(0);
+    z.unexport();  
+  })
+  process.exit();
 });
 
 

@@ -30,12 +30,14 @@ function handler (req, res) {
 
 
 io.sockets.on('connection', function (socket) {
-  socket.on('zone1', function(data) { //get light switch status from client
-    var zonevalue = data;
-    if (zonevalue != CH1.readSync()) { //only change LED if status has changed
-      CH1.writeSync(zonevalue); //turn LED on or off
+  socket.on('zone', function(data) {
+    console.log(data);
+    var value = data.value;
+    var id = data.id;
+    if (value != ZONEs[id].readSync()) {
+      ZONEs[id].writeSync(value);
     }
-      socket.emit('event', zonevalue + ' #1'); //send button status to client
+      socket.emit('event', value + ' #1');
   });
 
 });

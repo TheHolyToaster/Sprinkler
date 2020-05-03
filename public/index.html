@@ -11,7 +11,7 @@
 <script>
 var socket = io();
 window.addEventListener("load", function(){
-  var INs = document.getElementByType("input");
+  var INs = document.getElementsByTagName("input");
   INs.forEach(function(z, i){
     z.addEventListener("change", function() {
       var zone = {id : i, value: Number(this.checked)}

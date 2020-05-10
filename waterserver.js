@@ -37,17 +37,24 @@ io.sockets.on('connection', function (socket) {
 
   socket.on('zone', function(data) {
     console.log(data);
-    var value = data.value;
+    resetZones();
+    var value = (data.value)? 0:1;
     var id = data.id;
     if (value != ZONEs[id].readSync()) {
       ZONEs[id].writeSync(value);
     }
       socket.emit('event', value + ' #1');
   });
+  socket.on('reset', resetZones);
 
 });
 
-
+function resetZones(){
+  console.log('reset zones');
+  ZONEs.forEach(function(z){
+    z.writeSync(1);
+  });
+};
 
 process.on('SIGINT', function () {
   ZONEs.forEach(function(z){

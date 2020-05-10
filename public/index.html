@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html>
 <body>
-<h1>Control Sprinkler  Zones</h1>
+<h1>Control Sprinkler Zones</h1>
+
+<button onclick='reset()'> Reset </button>
 
 <div id = "zones"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script> 
@@ -9,13 +11,19 @@
 <!-- include socket.io client side script -->
 
 <script>
+
+function reset(){
+  console.log('send reset');
+  socket.emit("reset");
+};
+
 var socket = io();
 function bind(){
   var INs = document.getElementsByTagName("input");
   Array.prototype.forEach.call(INs, function(z,i) {
       console.log(i + ': ' +z);
       z.addEventListener("change", function() {
-      var zone = {id : i, value: Number(this.checked)}
+      var zone = {id : i, value: (this.checked)}
       socket.emit("zone", zone );
     });
   });
@@ -28,7 +36,7 @@ socket.on('length!', function (data) {
   console.log(title);
   var i;
   for (i = 0; i < data; i++) {
-    title.innerHTML += '<p><input type="checkbox" >Zone ' +(i+1)+ '</p>';
+    title.innerHTML += '<p><input type="radio" name="zone" >Zone ' +(i+1)+ '</p>';
   }
   bind();
 

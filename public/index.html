@@ -4,6 +4,7 @@
 <h1>Control Sprinkler Zones</h1>
 
 <button onclick='reset()'> Reset </button>
+<button onclick='cycle()'> Cycle </button>
 
 <div id = "zones"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script> 
@@ -11,6 +12,11 @@
 <!-- include socket.io client side script -->
 
 <script>
+
+function cycle(){
+  console.log('send loop');
+  socket.emit("loop");
+};
 
 function reset(){
   console.log('send reset');

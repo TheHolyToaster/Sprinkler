@@ -58,6 +58,7 @@ var timer;
 function loopZones(){
   if (index >= ZONEs.length) {
     resetZones();
+    index = 0;
     return;
   };
   if (timer !== null) {

@@ -6,12 +6,20 @@
 <button onclick='reset()'> Reset </button>
 <button onclick='cycle()'> Cycle </button>
 
+
 <div id = "zones"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script> 
 
 <!-- include socket.io client side script -->
 
 <script>
+  
+/*
+function setZone(id){
+  var radioButton = document.getElementById(id);
+  radioButton.setAttribute("checked", true);
+};
+*/
 
 function cycle(){
   console.log('send loop');
@@ -42,10 +50,16 @@ socket.on('length!', function (data) {
   console.log(title);
   var i;
   for (i = 0; i < data; i++) {
-    title.innerHTML += '<p><input type="radio" name="zone" >Zone ' +(i+1)+ '</p>';
+    title.innerHTML += '<p><input type="radio" name="zone" id= '+i+' >Zone ' +(i+1)+ '</p>';
   }
   bind();
+});
 
+socket.on('event', function (data){
+  console.log("ID "+ data._id + ', value ' + data._value);
+  var radioButton = document.getElementById(data._id);
+ 
+  radioButton.checked= data._value;
 });
 
 </script>

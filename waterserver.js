@@ -8,10 +8,10 @@ var CH1 = new Gpio(22, 'out'),
     CH4 = new Gpio(25, 'out');
 
 var ZONEs = [CH1, CH2, CH3, CH4];
-
 var http = require('http').createServer(handler); 
 var fs = require('fs'); 
 var io = require('socket.io')(http) 
+var _socket= null;
 
 console.log('starting webserver ');
 
@@ -32,9 +32,14 @@ function handler (req, res) {
 }
 
 
+
+
 io.sockets.on('connection', function (socket) {
+  console.log('client connected '+socket);
+
+_socket=socket;
   socket.on('length?', function(data) {
-    
+
       socket.emit('length!', ZONEs.length);
   });
 
@@ -43,14 +48,28 @@ io.sockets.on('connection', function (socket) {
     resetZones();
     var value = (data.value)? ON:OFF;
     var id = data.id;
-    if (value != ZONEs[id].readSync()) {
-      ZONEs[id].writeSync(value);
-    }
-      socket.emit('event', value + ' #1');
+    setZone(id, value);
   });
   socket.on('loop', loopZones); 
   socket.on('reset', resetZones);
+
 });
+
+function setZone(id, value){
+  console.log("set zone, id: "+id+" value: "+value);
+  var z = ZONEs[id];
+  if (value != z.readSync()) {
+      z.writeSync(value);
+      if (_socket !== null) {
+         console.log("send event to client");
+         var event = {
+           _id : id,
+           _value : (value == ON)? true : false
+         };
+        _socket.emit('event', event );
+      }
+    }
+};
 
 var index = 0;
 var timer;
@@ -66,27 +85,22 @@ function loopZones(){
   }
   console.log('loop zones');
   resetZones();
-  ZONEs[index].writeSync(ON);
+  setZone(index, ON);
   ++index;
   timer = setTimeout(loopZones ,1000);
 };
 
 function resetZones(){
   console.log('reset zones');
-  ZONEs.forEach(function(z){
-    z.writeSync(OFF);
+  ZONEs.forEach(function(z, id){
+    setZone(id, OFF);
   });
 };
 
-
-
 process.on('SIGINT', function () {
-  ZONEs.forEach(function(z){
-    z.writeSync(ON);
+  ZONEs.forEach(function(z, id){
+    setZone(id, ON);
     z.unexport();  
-  })
+  })  
   process.exit();
 });
-
-
-

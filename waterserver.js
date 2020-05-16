@@ -1,17 +1,22 @@
+//hello!
+
+var Gpio = require('onoff').Gpio; 
+var http = require('http').createServer(handler); 
+var fs = require('fs'); 
+var io = require('socket.io')(http) 
 var ON = 0;
 var OFF = 1;
 
-var Gpio = require('onoff').Gpio; 
+var index = 0;
+var timer;
+var _socket = null;
+
 var CH1 = new Gpio(22, 'out'),
     CH2 = new Gpio(23, 'out'),
     CH3 = new Gpio(24, 'out'),
     CH4 = new Gpio(25, 'out');
 
 var ZONEs = [CH1, CH2, CH3, CH4];
-var http = require('http').createServer(handler); 
-var fs = require('fs'); 
-var io = require('socket.io')(http) 
-var _socket= null;
 
 console.log('starting webserver ');
 
@@ -31,9 +36,6 @@ function handler (req, res) {
   });
 }
 
-
-
-
 io.sockets.on('connection', function (socket) {
   console.log('client connected '+socket);
 
@@ -52,7 +54,6 @@ _socket=socket;
   });
   socket.on('loop', loopZones); 
   socket.on('reset', resetZones);
-
 });
 
 function setZone(id, value){
@@ -70,9 +71,6 @@ function setZone(id, value){
       }
     }
 };
-
-var index = 0;
-var timer;
 
 function loopZones(){
   if (index >= ZONEs.length) {

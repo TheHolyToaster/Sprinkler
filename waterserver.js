@@ -11,17 +11,74 @@ var index = 0;
 var timer;
 var _socket = null;
 
+var SEC = 1000;
+var MIN = SEC*60;
+var HOUR = MIN*60;
+var DAY = HOUR*24;
+
 var CH1 = new Gpio(22, 'out'),
     CH2 = new Gpio(23, 'out'),
     CH3 = new Gpio(24, 'out'),
     CH4 = new Gpio(25, 'out');
 
-var ZONEs = [CH1, CH2, CH3, CH4];
+var zone1 = {
+  id : 0,
+  channel : CH1, 
+  name : "Zone 1",
+  runTime : 30*MIN
+};
+var zone2 = {
+  id : 1,
+  channel : CH2, 
+  name : "Zone 2",
+  runTime : 30*MIN
+};
+var zone3 = {
+  id : 2,
+  channel : CH3, 
+  name : "Zone 3",
+  runTime : 30*MIN
+};
+var zone4 = {
+  id : 3,
+  channel : CH4, 
+  name : "Zone 4",
+  runTime : 30*MIN
+};
+
+var zones = [zone1, zone2, zone3, zone4];
+
+setInterval(checkSchedule, 1*SEC);
+var waterState = false;
+var scheduleTime = {
+  hour : 2,
+  minute : 0,
+  second : 0
+};
 
 console.log('starting webserver ');
 
 http.listen(1234); 
 resetZones();
+
+function checkSchedule(){
+  var now = new Date();
+  var checkHour = now.getHours();
+  var checkMin = now.getMinutes();
+  var checkSec = now.getSeconds();
+
+  // console.log(now.getHours()+':'+now.getMinutes()+':'+now.getSeconds());
+
+  if (checkHour == scheduleTime.hour && 
+    checkMin == scheduleTime.minute && 
+    checkSec >= scheduleTime.second && 
+    checkSec <= scheduleTime.second+5){
+    if (waterState == false){
+      console.log("Time has been reached.");
+      loopZones();
+    }
+  }
+};
 
 function handler (req, res) {
   console.log('new request');
@@ -42,7 +99,7 @@ io.sockets.on('connection', function (socket) {
 _socket=socket;
   socket.on('length?', function(data) {
 
-      socket.emit('length!', ZONEs.length);
+      socket.emit('length!', zones.length);
   });
 
   socket.on('zone', function(data) {
@@ -58,9 +115,9 @@ _socket=socket;
 
 function setZone(id, value){
   console.log("set zone, id: "+id+" value: "+value);
-  var z = ZONEs[id];
-  if (value != z.readSync()) {
-      z.writeSync(value);
+  var z = zones[id];
+  if (value != z.channel.readSync()) {
+      z.channel.writeSync(value);
       if (_socket !== null) {
          console.log("send event to client");
          var event = {
@@ -73,9 +130,11 @@ function setZone(id, value){
 };
 
 function loopZones(){
-  if (index >= ZONEs.length) {
+  waterState = true;
+  if (index >= zones.length) {
     resetZones();
     index = 0;
+    waterState = false;
     return;
   };
   if (timer !== null) {
@@ -84,21 +143,21 @@ function loopZones(){
   console.log('loop zones');
   resetZones();
   setZone(index, ON);
+  timer = setTimeout(loopZones ,zones[index].runTime);
   ++index;
-  timer = setTimeout(loopZones ,1000);
 };
 
 function resetZones(){
   console.log('reset zones');
-  ZONEs.forEach(function(z, id){
+  zones.forEach(function(z, id){
     setZone(id, OFF);
   });
 };
 
 process.on('SIGINT', function () {
-  ZONEs.forEach(function(z, id){
+  zones.forEach(function(z, id){
     setZone(id, ON);
-    z.unexport();  
+    z.channel.unexport();  
   })  
   process.exit();
 });
